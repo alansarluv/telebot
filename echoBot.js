@@ -3,6 +3,16 @@ const Telegraf = require('telegraf');
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
+// function middleware for log history
+bot.use((ctx, next) => {
+  if (ctx.updateSubTypes[0] == "text") {
+    console.log(ctx.from.username + " said: " + ctx.message.text);
+  } else {
+    console.log(ctx.from.username + " sent: " + ctx.updateSubTypes[0]);
+  }
+  next();
+})
+
 const helpMessage = `
 Say something to me :
 /start - start the bot
@@ -10,17 +20,14 @@ Say something to me :
 `
 
 bot.start((ctx) => {
-  Logger(ctx);
   ctx.reply("Hi there, i am echo bot");
   ctx.reply(helpMessage);
 });
 bot.help((ctx) => {
-  Logger(ctx);
   ctx.reply(helpMessage);
 });
 
 bot.command("echo", (ctx) => {
-  Logger(ctx);
   const input = ctx.message.text;
   const inputArg = input.split("/echo ")[1];
   let replyEchoText = "You said echo";
@@ -29,13 +36,6 @@ bot.command("echo", (ctx) => {
   }
   ctx.reply(replyEchoText);
 })
-
-
-// function for log history
-function Logger(ctx) {
-  // console.log("Someone used your bot");
-  console.log(ctx.from.username + "said: " + ctx.message.text);
-}
 
 // ================ ============================== ================
 // ================         launch the bot         ================
